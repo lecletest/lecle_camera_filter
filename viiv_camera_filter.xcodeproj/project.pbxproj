@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5432B894271FE6A000753154 /* PreviewMetalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5432B892271FE6A000753154 /* PreviewMetalView.swift */; };
 		54C446EE271F188200EA3EC2 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54C446ED271F188200EA3EC2 /* AppDelegate.swift */; };
 		54C446F0271F188200EA3EC2 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54C446EF271F188200EA3EC2 /* SceneDelegate.swift */; };
 		54C446F2271F188200EA3EC2 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54C446F1271F188200EA3EC2 /* ViewController.swift */; };
@@ -19,6 +20,27 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		5432B87F271FC11E00753154 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5432B87A271FC11E00753154 /* GPUImage.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = BCE0BE7C20D6DE610006E120;
+			remoteInfo = GPUImage_iOS;
+		};
+		5432B881271FC11E00753154 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5432B87A271FC11E00753154 /* GPUImage.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = BCE0BE8C20D6E2B80006E120;
+			remoteInfo = GPUImage_macOS;
+		};
+		5432B883271FC1D600753154 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5432B87A271FC11E00753154 /* GPUImage.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = BCE0BE7B20D6DE610006E120;
+			remoteInfo = GPUImage_iOS;
+		};
 		54C44701271F188600EA3EC2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 54C446E2271F188200EA3EC2 /* Project object */;
@@ -35,7 +57,21 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		54C4472A271F193200EA3EC2 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 12;
+			dstPath = "";
+			dstSubfolderSpec = 7;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		5432B87A271FC11E00753154 /* GPUImage.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = GPUImage.xcodeproj; path = "../../../Downloads/GPUImage3-master/framework/GPUImage.xcodeproj"; sourceTree = "<group>"; };
+		5432B892271FE6A000753154 /* PreviewMetalView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PreviewMetalView.swift; path = ../../../../Downloads/AVCamFilterApplyingFiltersToACaptureStream/AVCamFilter/PreviewMetalView.swift; sourceTree = "<group>"; };
 		54C446EA271F188200EA3EC2 /* viiv_camera_filter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = viiv_camera_filter.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		54C446ED271F188200EA3EC2 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		54C446EF271F188200EA3EC2 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -76,13 +112,24 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		5432B87B271FC11E00753154 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				5432B880271FC11E00753154 /* GPUImage.framework */,
+				5432B882271FC11E00753154 /* GPUImage.framework */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		54C446E1271F188200EA3EC2 = {
 			isa = PBXGroup;
 			children = (
+				5432B87A271FC11E00753154 /* GPUImage.xcodeproj */,
 				54C446EC271F188200EA3EC2 /* viiv_camera_filter */,
 				54C44703271F188600EA3EC2 /* viiv_camera_filterTests */,
 				54C4470D271F188600EA3EC2 /* viiv_camera_filterUITests */,
 				54C446EB271F188200EA3EC2 /* Products */,
+				54C44728271F18B100EA3EC2 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -99,6 +146,7 @@
 		54C446EC271F188200EA3EC2 /* viiv_camera_filter */ = {
 			isa = PBXGroup;
 			children = (
+				5432B892271FE6A000753154 /* PreviewMetalView.swift */,
 				54C446ED271F188200EA3EC2 /* AppDelegate.swift */,
 				54C446EF271F188200EA3EC2 /* SceneDelegate.swift */,
 				54C446F1271F188200EA3EC2 /* ViewController.swift */,
@@ -127,6 +175,13 @@
 			path = viiv_camera_filterUITests;
 			sourceTree = "<group>";
 		};
+		54C44728271F18B100EA3EC2 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -137,10 +192,12 @@
 				54C446E6271F188200EA3EC2 /* Sources */,
 				54C446E7271F188200EA3EC2 /* Frameworks */,
 				54C446E8271F188200EA3EC2 /* Resources */,
+				54C4472A271F193200EA3EC2 /* CopyFiles */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				5432B884271FC1D600753154 /* PBXTargetDependency */,
 			);
 			name = viiv_camera_filter;
 			productName = viiv_camera_filter;
@@ -217,6 +274,12 @@
 			mainGroup = 54C446E1271F188200EA3EC2;
 			productRefGroup = 54C446EB271F188200EA3EC2 /* Products */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 5432B87B271FC11E00753154 /* Products */;
+					ProjectRef = 5432B87A271FC11E00753154 /* GPUImage.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				54C446E9271F188200EA3EC2 /* viiv_camera_filter */,
@@ -225,6 +288,23 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		5432B880271FC11E00753154 /* GPUImage.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = GPUImage.framework;
+			remoteRef = 5432B87F271FC11E00753154 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		5432B882271FC11E00753154 /* GPUImage.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = GPUImage.framework;
+			remoteRef = 5432B881271FC11E00753154 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		54C446E8271F188200EA3EC2 /* Resources */ = {
@@ -259,6 +339,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				54C446F2271F188200EA3EC2 /* ViewController.swift in Sources */,
+				5432B894271FE6A000753154 /* PreviewMetalView.swift in Sources */,
 				54C446EE271F188200EA3EC2 /* AppDelegate.swift in Sources */,
 				54C446F0271F188200EA3EC2 /* SceneDelegate.swift in Sources */,
 			);
@@ -284,6 +365,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		5432B884271FC1D600753154 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = GPUImage_iOS;
+			targetProxy = 5432B883271FC1D600753154 /* PBXContainerItemProxy */;
+		};
 		54C44702271F188600EA3EC2 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 54C446E9271F188200EA3EC2 /* viiv_camera_filter */;
@@ -319,7 +405,8 @@
 		54C44712271F188600EA3EC2 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ALWAYS_SEARCH_USER_PATHS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
@@ -353,6 +440,7 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				FRAMEWORK_SEARCH_PATHS = "$'inherited'";
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -380,7 +468,8 @@
 		54C44713271F188600EA3EC2 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ALWAYS_SEARCH_USER_PATHS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
@@ -414,6 +503,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				FRAMEWORK_SEARCH_PATHS = "$'inherited'";
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -440,6 +530,8 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = Z5WNM73QU9;
+				ENABLE_BITCODE = NO;
+				FRAMEWORK_SEARCH_PATHS = "$'inherited'";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = viiv_camera_filter/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -447,6 +539,7 @@
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -468,6 +561,8 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = Z5WNM73QU9;
+				ENABLE_BITCODE = NO;
+				FRAMEWORK_SEARCH_PATHS = "$'inherited'";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = viiv_camera_filter/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -475,6 +570,7 @@
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
