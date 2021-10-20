@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		5432B894271FE6A000753154 /* PreviewMetalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5432B892271FE6A000753154 /* PreviewMetalView.swift */; };
+		5432B8962720310C00753154 /* ViewController+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5432B8952720310C00753154 /* ViewController+Extension.swift */; };
 		54C446EE271F188200EA3EC2 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54C446ED271F188200EA3EC2 /* AppDelegate.swift */; };
 		54C446F0271F188200EA3EC2 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54C446EF271F188200EA3EC2 /* SceneDelegate.swift */; };
 		54C446F2271F188200EA3EC2 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54C446F1271F188200EA3EC2 /* ViewController.swift */; };
@@ -72,6 +73,7 @@
 /* Begin PBXFileReference section */
 		5432B87A271FC11E00753154 /* GPUImage.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = GPUImage.xcodeproj; path = "../../../Downloads/GPUImage3-master/framework/GPUImage.xcodeproj"; sourceTree = "<group>"; };
 		5432B892271FE6A000753154 /* PreviewMetalView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PreviewMetalView.swift; path = ../../../../Downloads/AVCamFilterApplyingFiltersToACaptureStream/AVCamFilter/PreviewMetalView.swift; sourceTree = "<group>"; };
+		5432B8952720310C00753154 /* ViewController+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ViewController+Extension.swift"; sourceTree = "<group>"; };
 		54C446EA271F188200EA3EC2 /* viiv_camera_filter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = viiv_camera_filter.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		54C446ED271F188200EA3EC2 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		54C446EF271F188200EA3EC2 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -154,6 +156,7 @@
 				54C446F6271F188600EA3EC2 /* Assets.xcassets */,
 				54C446F8271F188600EA3EC2 /* LaunchScreen.storyboard */,
 				54C446FB271F188600EA3EC2 /* Info.plist */,
+				5432B8952720310C00753154 /* ViewController+Extension.swift */,
 			);
 			path = viiv_camera_filter;
 			sourceTree = "<group>";
@@ -341,6 +344,7 @@
 				54C446F2271F188200EA3EC2 /* ViewController.swift in Sources */,
 				5432B894271FE6A000753154 /* PreviewMetalView.swift in Sources */,
 				54C446EE271F188200EA3EC2 /* AppDelegate.swift in Sources */,
+				5432B8962720310C00753154 /* ViewController+Extension.swift in Sources */,
 				54C446F0271F188200EA3EC2 /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
