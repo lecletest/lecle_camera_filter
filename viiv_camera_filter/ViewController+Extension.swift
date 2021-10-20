@@ -161,6 +161,12 @@ extension ViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
             let path = self.saveImageToDocumentDirectory(uiImage)
             print("saveImageToDocumentDirectory: \(path)")
             
+            if #available(iOS 9.0, *) {
+                   AudioServicesPlaySystemSoundWithCompletion(SystemSoundID(1108), nil)
+               } else {
+                   AudioServicesPlaySystemSound(1108)
+               }
+            
         }
         
     }
