@@ -2,6 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>XIn quyền micro nào</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>XIn quyền photo nào</string>
 	<key>NSCameraUsageDescription</key>
 	<string>Xin quyền camera nào</string>
 	<key>UIApplicationSceneManifest</key>

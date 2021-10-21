@@ -8,17 +8,23 @@
 import UIKit
 import AVFoundation
 import MetalKit
+import Photos
 
 class ViewController: UIViewController {
-    //MARK:- Vars
-    var captureSession : AVCaptureSession!
     
+    //MARK:- Vars
+    let captureSession = AVCaptureSession()
+    
+    
+    var audioDataOutput : AVCaptureAudioDataOutput!
+    var videoDataOutput : AVCaptureVideoDataOutput!
     var backCamera : AVCaptureDevice!
     var frontCamera : AVCaptureDevice!
     var backInput : AVCaptureInput!
     var frontInput : AVCaptureInput!
     
-    var videoOutput : AVCaptureVideoDataOutput!
+    
+    
     
     var takePicture = false
     var backCameraOn = true
@@ -37,11 +43,19 @@ class ViewController: UIViewController {
     let fadeFilter = CIFilter(name: "CIPhotoEffectFade")
     let sepiaFilter = CIFilter(name: "CISepiaTone")
     let gaussianBlur = CIFilter(name: "CIGaussianBlur")
-    let testFilter = CIFilter(name: "CIBloom")
+    let testFilter = CIFilter(name: "CIEdges")
     
     
     
     //MARK:- View Components
+    
+    let recordingLabel : UILabel = {
+        let label = UILabel()
+        label.backgroundColor = .black
+        label.textColor = .white
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
     let switchCameraButton : UIButton = {
         let button = UIButton()
         button.backgroundColor = .red
@@ -56,6 +70,15 @@ class ViewController: UIViewController {
         button.backgroundColor = .green
         button.tintColor = .green
         button.layer.cornerRadius = 8
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+    
+    let recordCameraButton : UIButton = {
+        let button = UIButton()
+        button.backgroundColor = .yellow
+        button.tintColor = .yellow
+        button.layer.cornerRadius = 25
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
@@ -90,7 +113,6 @@ class ViewController: UIViewController {
     func setupAndStartCaptureSession(){
         DispatchQueue.global(qos: .userInitiated).async{
             //init session
-            self.captureSession = AVCaptureSession()
             //start configuration
             self.captureSession.beginConfiguration()
             
@@ -98,6 +120,7 @@ class ViewController: UIViewController {
             if self.captureSession.canSetSessionPreset(.photo) {
                 self.captureSession.sessionPreset = .photo
             }
+            
             self.captureSession.automaticallyConfiguresCaptureDeviceForWideColor = true
             
             //setup inputs
@@ -111,6 +134,89 @@ class ViewController: UIViewController {
             //start running it
             self.captureSession.startRunning()
         }
+        
+        
+    }
+    func setupRecordWriters(){
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyyMMddhhmmss"
+        let filename = dateFormatter.string(from: Date()).appending(".mp4")
+        
+        let documentsPath = self.getDocumentsDirectory().path
+        self.videoDataOutputFullFileName = documentsPath.appending("/\(filename)")
+        
+        let fileManager = FileManager.default
+        
+        if fileManager.fileExists(atPath: self.videoDataOutputFullFileName!) {
+            print("WARN:::The file: \(self.videoDataOutputFullFileName!) exists, will delete the existing file")
+            do {
+                try fileManager.removeItem(atPath: self.videoDataOutputFullFileName!)
+            } catch let error as NSError {
+                print("WARN:::Cannot delete existing file: \(self.videoDataOutputFullFileName!), error: \(error.debugDescription)")
+            }
+        } else {
+            print("DEBUG:::The file \(self.videoDataOutputFullFileName!) not exists")
+        }
+        
+        if self.videoDataOutputFullFileName == nil {
+            print("Error:The video output file name is nil")
+            return
+        }
+        
+        
+        //Add video input
+        self.videoWriterInput = AVAssetWriterInput(mediaType: AVMediaType.video, outputSettings: [
+            AVVideoCodecKey: AVVideoCodecType.h264,
+            AVVideoWidthKey: self.mtkView.bounds.width,
+            AVVideoHeightKey: self.mtkView.bounds.height,
+            AVVideoCompressionPropertiesKey:[
+                AVVideoAverageBitRateKey: self.mtkView.bounds.width * self.mtkView.bounds.height * 10.1
+            ]
+        ])
+        
+        self.videoWriterInput?.expectsMediaDataInRealTime = true
+        
+        //Add audio input
+        audioWriterInput = AVAssetWriterInput(mediaType: AVMediaType.audio, outputSettings: [
+            AVFormatIDKey: kAudioFormatMPEG4AAC,
+            AVNumberOfChannelsKey: 1,
+            AVSampleRateKey: 44100,
+            AVEncoderBitRateKey: 64000,
+        ])
+        audioWriterInput?.expectsMediaDataInRealTime = true
+        
+        
+        do {
+            self.videoWriter = try AVAssetWriter(outputURL: URL(fileURLWithPath: self.videoDataOutputFullFileName!), fileType: AVFileType.mp4)
+        } catch let error as NSError {
+            print("ERROR:::::>>>>>>>>>>>>>Cannot init videoWriter, error:\(error.localizedDescription)")
+        }
+        
+        
+        let sourcePixelBufferAttributes = [
+            kCVPixelBufferPixelFormatTypeKey as String: NSNumber(value: kCVPixelFormatType_32BGRA),
+            kCVPixelBufferWidthKey as String: NSNumber(value: Int32(self.mtkView.bounds.width)),
+            kCVPixelBufferHeightKey as String: NSNumber(value: Int32(self.mtkView.bounds.height))
+        ]
+        
+        self.videoWriterInputPixelBufferAdaptor = AVAssetWriterInputPixelBufferAdaptor(
+            assetWriterInput: self.videoWriterInput!,
+            sourcePixelBufferAttributes: sourcePixelBufferAttributes
+        )
+        
+        if self.videoWriter!.canAdd(self.videoWriterInput!) {
+            self.videoWriter!.add(self.videoWriterInput!)
+        } else {
+            print("ERROR:::Cannot add videoWriterInput into videoWriter")
+        }
+        
+        
+        if self.videoWriter!.canAdd(self.audioWriterInput!) {
+            self.videoWriter!.add(self.audioWriterInput!)
+        } else {
+            print("ERROR:::Cannot add audioWriterInput into videoWriter")
+        }
+        
     }
     func stopCaptureSession(){
         
@@ -149,22 +255,55 @@ class ViewController: UIViewController {
             fatalError("could not add front camera input to capture session")
         }
         
+        //Setup your microphone
+        guard let audioDevice = AVCaptureDevice.default(for: AVMediaType.audio) else {
+            fatalError("could not create input device from audio")
+        }
+        
+        guard let audioInput =  try? AVCaptureDeviceInput(device: audioDevice) else {
+            fatalError("could not create input device from audio")
+        }
+        
+        if captureSession.canAddInput(audioInput) {
+            captureSession.addInput(audioInput)
+        }else{
+            fatalError("could not create input device from audio")
+        }
+        
         //connect back camera input to session
         captureSession.addInput(backInput)
     }
     
     func setupOutput(){
-        videoOutput = AVCaptureVideoDataOutput()
-        let videoQueue = DispatchQueue(label: "videoQueue", qos: .userInteractive)
-        videoOutput.setSampleBufferDelegate(self, queue: videoQueue)
+        videoDataOutput = AVCaptureVideoDataOutput()
+        videoDataOutput.videoSettings = [
+            (kCVPixelBufferPixelFormatTypeKey as String) : NSNumber(value: kCVPixelFormatType_420YpCbCr8BiPlanarFullRange)
+        ]
         
-        if captureSession.canAddOutput(videoOutput) {
-            captureSession.addOutput(videoOutput)
+        videoDataOutput.alwaysDiscardsLateVideoFrames = true
+        
+        let videoQueue = DispatchQueue(label: "videoQueue", qos: .userInteractive)
+        
+        
+        if captureSession.canAddOutput(videoDataOutput) {
+            videoDataOutput.setSampleBufferDelegate(self, queue: videoQueue)
+            captureSession.addOutput(videoDataOutput)
         } else {
             fatalError("could not add video output")
         }
         
-        videoOutput.connections.first?.videoOrientation = .portrait
+        audioDataOutput = AVCaptureAudioDataOutput()
+        
+        if captureSession.canAddOutput(audioDataOutput) {
+            audioDataOutput.setSampleBufferDelegate(self, queue: videoQueue)
+            captureSession.addOutput(audioDataOutput)
+        } else {
+            fatalError("could not add audio output")
+        }
+        
+        videoDataOutput.connections.first?.videoOrientation = .portrait
+
+        
     }
     
     func switchCameraInput(){
@@ -184,10 +323,10 @@ class ViewController: UIViewController {
         }
         
         //deal with the connection again for portrait mode
-        videoOutput.connections.first?.videoOrientation = .portrait
+        videoDataOutput.connections.first?.videoOrientation = .portrait
         
         //mirror video if front camera
-        videoOutput.connections.first?.isVideoMirrored = !backCameraOn
+        videoDataOutput.connections.first?.isVideoMirrored = !backCameraOn
         
         //commit config
         captureSession.commitConfiguration()
@@ -228,27 +367,24 @@ class ViewController: UIViewController {
     func setupFilters(){
         sepiaFilter?.setValue(NSNumber(value: 1), forKeyPath: "inputIntensity")
         gaussianBlur?.setValue(NSNumber(value: 20), forKeyPath: "inputRadius")
-        
-        testFilter?.setValue(NSNumber(value: 20), forKeyPath: "inputRadius")
         testFilter?.setValue(NSNumber(value: 1.5), forKeyPath: "inputIntensity")
-        
     }
     
     func applyFilters(inputImage image: CIImage) -> CIImage? {
         var filteredImage : CIImage?
         
         // apply filters
-        //        sepiaFilter?.setValue(image, forKeyPath: kCIInputImageKey)
-        //        filteredImage = sepiaFilter?.outputImage
+        sepiaFilter?.setValue(image, forKeyPath: kCIInputImageKey)
+        filteredImage = sepiaFilter?.outputImage
         
         //        fadeFilter?.setValue(image, forKeyPath: kCIInputImageKey)
         //        filteredImage = fadeFilter?.outputImage
         //
-        //        gaussianBlur?.setValue(image, forKeyPath: kCIInputImageKey)
-        //        filteredImage = gaussianBlur?.outputImage
+        // gaussianBlur?.setValue(image, forKeyPath: kCIInputImageKey)
+        // filteredImage = gaussianBlur?.outputImage
         
-        testFilter?.setValue(image, forKeyPath: kCIInputImageKey)
-        filteredImage = testFilter?.outputImage
+        //        testFilter?.setValue(image, forKeyPath: kCIInputImageKey)
+        //        filteredImage = testFilter?.outputImage
         
         return filteredImage
     }
@@ -265,25 +401,105 @@ class ViewController: UIViewController {
     @objc func flashCamera(_ sender: UIButton?){
         if(backCameraOn){
             guard let device = AVCaptureDevice.default(for: .video) else { return }
-                if device.hasTorch {
-                    do {
-                        try device.lockForConfiguration()
+            if device.hasTorch {
+                do {
+                    try device.lockForConfiguration()
+                    
+                    if device.torchMode == .off {
+                        device.torchMode = .on
+                    } else {
+                        device.torchMode = .off
+                    }
+                    
+                    device.unlockForConfiguration()
+                } catch {
+                    print("Torch could not be used")
+                }
+            } else {
+                print("Torch is not available")
+            }
+        }
+    }
+    
+    var recording = false
+    var videoDataOutputFullFileName: String?
+    
+    var videoWriterInput: AVAssetWriterInput?
+    var audioWriterInput: AVAssetWriterInput?
+    
+    var videoWriter: AVAssetWriter?
+    
+    var videoWriterInputPixelBufferAdaptor: AVAssetWriterInputPixelBufferAdaptor?
+    
+    var frameCounter = 0
+    
+    let filterContext = CIContext()
 
-                        if device.torchMode == .off {
-                            device.torchMode = .on
-                        } else {
-                            device.torchMode = .off
+    
+    lazy var lastSampleTime: CMTime = {
+        let lastSampleTime = CMTime.zero
+        return lastSampleTime
+    }()
+    
+    @objc func recordCamera(_ sender: UIButton?){
+        print("recordCamera clicked \(recording)")
+        
+        if(!recording){
+            recordingLabel.isHidden = false
+            recordingLabel.text = "Recording..."
+            self.setupRecordWriters()
+            recording = true
+            
+            if self.videoWriter!.status != AVAssetWriter.Status.writing  {
+                print("DEBUG::::::::::::::::The videoWriter status is not writing, and will start writing the video.")
+                
+                let hasStartedWriting = self.videoWriter!.startWriting()
+                if hasStartedWriting {
+                    self.videoWriter!.startSession(atSourceTime: self.lastSampleTime)
+                    print("DEBUG:::Have started writting on videoWriter, session at source time: \(self.lastSampleTime)")
+                    
+                } else {
+                    print("WARN:::Fail to start writing on videoWriter")
+                }
+            } else {
+                print("WARN:::The videoWriter.status is writting now, so cannot start writing action on videoWriter")
+            }
+            
+        }else{
+            self.finishRecordVideo()
+            recordingLabel.isHidden = true
+        }
+    }
+    
+    func finishRecordVideo() {
+        self.recording = false
+        self.videoWriterInput!.markAsFinished()
+        self.videoWriterInputPixelBufferAdaptor = nil
+        self.videoWriter!.finishWriting {
+            if self.videoWriter!.status == AVAssetWriter.Status.completed {
+                print("DEBUG:::The videoWriter status is completed")
+                let fileManager = FileManager.default
+                if fileManager.fileExists(atPath: self.videoDataOutputFullFileName!) {
+                    print("DEBUG:::The file: \(self.videoDataOutputFullFileName ?? "path") has been save into documents folder, and is ready to be moved to camera roll")
+                    PHPhotoLibrary.shared().performChanges({
+                        PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: URL(fileURLWithPath: self.videoDataOutputFullFileName!))
+                    }) { completed, error in
+                        if completed {
+                            print("Video \(self.videoDataOutputFullFileName) has been moved to camera roll")
                         }
-
-                        device.unlockForConfiguration()
-                    } catch {
-                        print("Torch could not be used")
+                        
+                        if error != nil {
+                            print ("ERROR:::Cannot move the video \(self.videoDataOutputFullFileName) to camera roll, error: \(error!.localizedDescription)")
+                        }
                     }
                 } else {
-                    print("Torch is not available")
+                    print("ERROR:::The file: \(self.videoDataOutputFullFileName) not exists, so cannot move this file camera roll")
                 }
+            } else {
+                print("WARN:::The videoWriter status is not completed, stauts: \(self.videoWriter!.status)")
+            }
         }
-      
+        
     }
 }
 
