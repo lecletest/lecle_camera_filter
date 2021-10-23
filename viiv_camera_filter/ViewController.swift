@@ -23,9 +23,6 @@ class ViewController: UIViewController {
     var backInput : AVCaptureInput!
     var frontInput : AVCaptureInput!
     
-    
-    
-    
     var takePicture = false
     var backCameraOn = true
     
@@ -35,19 +32,62 @@ class ViewController: UIViewController {
     
     //core image
     var ciContext : CIContext!
-    
     var currentCIImage : CIImage?
     
-    var mBound : CGRect!
     
-    let fadeFilter = CIFilter(name: "CIPhotoEffectFade")
-    let sepiaFilter = CIFilter(name: "CISepiaTone")
-    let gaussianBlur = CIFilter(name: "CIGaussianBlur")
-    let testFilter = CIFilter(name: "CIEdges")
+    var mVideoBound : CGRect!
     
+    var currentFilter = CIFilter(name: "CIPhotoEffectFade")
+    let mtkView = MTKView()
     
+    lazy var supportedFilters = ["CIMedianFilter",
+                                 "CIMotionBlur",
+                                 "CILinearToSRGBToneCurve",
+                                 "CISRGBToneCurveToLinear",
+                                 "CITemperatureAndTint",
+                                 "CIColorInvert",
+                                 "CIColorMonochrome",
+                                 "CIColorPosterize",
+                                 "CIFalseColor",
+                                 "CIMaskToAlpha",
+                                 "CIMaximumComponent",
+                                 "CIMinimumComponent",
+                                 "CIPhotoEffectChrome",
+                                 "CIPhotoEffectFade",
+                                 "CIPhotoEffectInstant",
+                                 "CIPhotoEffectMono",
+                                 "CIPhotoEffectNoir",
+                                 "CIPhotoEffectProcess",
+                                 "CIPhotoEffectTonal",
+                                 "CIPhotoEffectTransfer",
+                                 "CISepiaTone",
+                                 "CIVignetteEffect",
+                                 "CICircularWrap",
+                                 "CIGlassLozenge",
+                                 "CIStretchCrop",
+                                 "CITorusLensDistortion",
+                                 "CITwirlDistortion",
+                                 "CIConstantColorGenerator",
+                                 "CIPerspectiveCorrection",
+                                 "CILinearGradient",
+                                 "CISmoothLinearGradient",
+                                 "CICircularScreen",
+                                 "CICMYKHalftone",
+                                 "CIDotScreen",
+                                 "CIHatchedScreen",
+                                 "CILineScreen",
+                                 "CIComicEffect",
+                                 "CICrystallize",
+                                 "CIEdges",
+                                 "CIEdgeWork",
+                                 "CIHeightFieldFromMask",
+                                 "CIHexagonalPixellate","CIPixellate",
+                                 "CIPointillize",
+                                 "CISpotColor",
+                                 "CISpotLight","CIKaleidoscope",]
     
     //MARK:- View Components
+    let filterPickerView = UIPickerView()
     
     let recordingLabel : UILabel = {
         let label = UILabel()
@@ -56,6 +96,7 @@ class ViewController: UIViewController {
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
+    
     let switchCameraButton : UIButton = {
         let button = UIButton()
         button.backgroundColor = .red
@@ -92,8 +133,14 @@ class ViewController: UIViewController {
         return button
     }()
     
-    
-    let mtkView = MTKView()
+    let filterCameraButton : UIButton = {
+        let button = UIButton()
+        button.backgroundColor = .systemPink
+        button.tintColor = .systemPink
+        button.layer.cornerRadius = 25
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
     
     //MARK:- Life Cycle
     override func viewDidLoad() {
@@ -163,12 +210,11 @@ class ViewController: UIViewController {
             return
         }
         
-        
         //Add video input
         self.videoWriterInput = AVAssetWriterInput(mediaType: AVMediaType.video, outputSettings: [
             AVVideoCodecKey: AVVideoCodecType.h264,
-            AVVideoWidthKey: self.mtkView.bounds.width,
-            AVVideoHeightKey: self.mtkView.bounds.height,
+            AVVideoWidthKey: mVideoBound.width,
+            AVVideoHeightKey: mVideoBound.height,
             AVVideoCompressionPropertiesKey:[
                 AVVideoAverageBitRateKey: self.mtkView.bounds.width * self.mtkView.bounds.height * 10.1
             ]
@@ -302,7 +348,7 @@ class ViewController: UIViewController {
         }
         
         videoDataOutput.connections.first?.videoOrientation = .portrait
-
+        
         
     }
     
@@ -346,6 +392,9 @@ class ViewController: UIViewController {
         //tell our MTKView to use explicit drawing meaning we have to call .draw() on it
         mtkView.isPaused = true
         mtkView.enableSetNeedsDisplay = false
+        mtkView.contentScaleFactor = UIScreen.main.nativeScale
+        mtkView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        mtkView.autoResizeDrawable = true
         
         //create a command queue to be able to send down instructions to the GPU
         metalCommandQueue = metalDevice.makeCommandQueue()
@@ -360,38 +409,28 @@ class ViewController: UIViewController {
     //MARK:- Core Image
     func setupCoreImage(){
         ciContext = CIContext(mtlDevice: metalDevice)
-        setupFilters()
-    }
-    
-    //MARK: Filters
-    func setupFilters(){
-        sepiaFilter?.setValue(NSNumber(value: 1), forKeyPath: "inputIntensity")
-        gaussianBlur?.setValue(NSNumber(value: 20), forKeyPath: "inputRadius")
-        testFilter?.setValue(NSNumber(value: 1.5), forKeyPath: "inputIntensity")
     }
     
     func applyFilters(inputImage image: CIImage) -> CIImage? {
         var filteredImage : CIImage?
-        
-        // apply filters
-        sepiaFilter?.setValue(image, forKeyPath: kCIInputImageKey)
-        filteredImage = sepiaFilter?.outputImage
-        
-        //        fadeFilter?.setValue(image, forKeyPath: kCIInputImageKey)
-        //        filteredImage = fadeFilter?.outputImage
-        //
-        // gaussianBlur?.setValue(image, forKeyPath: kCIInputImageKey)
-        // filteredImage = gaussianBlur?.outputImage
-        
-        //        testFilter?.setValue(image, forKeyPath: kCIInputImageKey)
-        //        filteredImage = testFilter?.outputImage
-        
+        // apply image filters
+        currentFilter?.setValue(image, forKeyPath: kCIInputImageKey)
+        filteredImage = currentFilter?.outputImage
         return filteredImage
     }
     
     //MARK:- Actions
     @objc func captureImage(_ sender: UIButton?){
         takePicture = true
+    }
+    
+    @objc func filterCameraClicked(_ sender: UIButton?){
+        let b =  filterPickerView.isHidden
+        if(b){
+            filterPickerView.isHidden = false
+        }else{
+            filterPickerView.isHidden = true
+        }
     }
     
     @objc func switchCamera(_ sender: UIButton?){
@@ -407,8 +446,10 @@ class ViewController: UIViewController {
                     
                     if device.torchMode == .off {
                         device.torchMode = .on
+                        self.flashCameraButton.backgroundColor = .green.withAlphaComponent(0.3)
                     } else {
                         device.torchMode = .off
+                        self.flashCameraButton.backgroundColor = .green
                     }
                     
                     device.unlockForConfiguration()
@@ -434,7 +475,7 @@ class ViewController: UIViewController {
     var frameCounter = 0
     
     let filterContext = CIContext()
-
+    
     
     lazy var lastSampleTime: CMTime = {
         let lastSampleTime = CMTime.zero
@@ -442,9 +483,8 @@ class ViewController: UIViewController {
     }()
     
     @objc func recordCamera(_ sender: UIButton?){
-        print("recordCamera clicked \(recording)")
-        
         if(!recording){
+            self.recordCameraButton.backgroundColor = .yellow.withAlphaComponent(0.3)
             recordingLabel.isHidden = false
             recordingLabel.text = "Recording..."
             self.setupRecordWriters()
@@ -468,6 +508,7 @@ class ViewController: UIViewController {
         }else{
             self.finishRecordVideo()
             recordingLabel.isHidden = true
+            self.recordCameraButton.backgroundColor = .yellow
         }
     }
     
